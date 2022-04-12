@@ -4,10 +4,11 @@ const handlebars = require('express-handlebars')
 const mongoose   = require('mongoose')
 const app        = express()
 const admin      = require('./routes/admin')
-const usuarios   = require("./routes/usuario")
 const path       = require('path')
 const session    = require('express-session')
 const flash      = require('connect-flash')
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 //models
 require("./models/Categoria")
@@ -45,6 +46,21 @@ const db = require("./config/db")
 
     //parser
     app.use(express.json())
+
+    //Swagger
+    const swaggerOptions = {
+        swaggerDefinition: {
+            info: {
+                title: 'API Rest do blog',
+                description: "Esta API permite a criação e recuperação das postagens do blog de NodeJS"
+            },
+        },
+        apis: ["./routes/admin.js"]
+    }
+
+    const swaggerDocs = swaggerJsDoc(swaggerOptions);
+    app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
     app.use(express.urlencoded({extended: true}))
 
     //handlebars
@@ -71,6 +87,7 @@ const db = require("./config/db")
             res.redirect("/404")
         })
     })
+
     app.get('/postagem/:slug', (req, res) => {
         Postagem.findOne({slug: req.params.slug}).populate("categoria").lean().then((postagem) => {
             if(postagem){
@@ -88,7 +105,6 @@ const db = require("./config/db")
     app.get("/categorias", (req, res) => {
         Categoria.find().lean().then((categorias) => {
             res.render("categorias/index", {categorias: categorias})
-
         }).catch((err) => {
             req.flash("error_msg", "houve um erro ao carregar as categorias")
             res.redirect("/")
@@ -117,12 +133,11 @@ const db = require("./config/db")
     app.get("/404", (req, res) => {
         res.send("Erro 404!")
     })
-    app.use('/admin', admin)
 
-    app.use("/usuarios", usuarios)
+    app.use('/admin', admin)
 
 // outros
     const PORT = process.env.PORT || 8081
     app.listen(PORT, () => {
-        console.log("Servidor rodando!")
+        console.log(`Servidor rodando na porta ${PORT}`)
     })

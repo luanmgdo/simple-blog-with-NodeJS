@@ -3,13 +3,12 @@
   <p class="lead">Este é um blog simples, desenvolvido com Node.js + Express + MongoDB para a disciplina de Desenvolvimento Full-Stack 2021-2</p>
   <hr class="my-4">
   <p>Aqui você vai poder ler sobre as atividades do mundo da computação</p>
-  {{#if user}}
-  
-  {{else}}
-  <p class="lead">
-    <a class="btn btn-primary btn-lg" href="/usuarios/registro" role="button">Crie uma conta</a>
-  </p>
-  {{/if}}
+
+  {{#unless user}}
+    <p class="lead">
+      <a class="btn btn-primary btn-lg" href="/admin/registro" role="button">Crie uma conta</a>
+    </p>
+  {{/unless}}
 </div>
 
 <hr>
